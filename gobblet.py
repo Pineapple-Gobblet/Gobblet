@@ -17,8 +17,8 @@ from argparse import ArgumentParser
 # Voici la représentation des Gobblets, n'hésitez pas à l'utiliser.
 # 1 pour le joueur 1, 2 pour le joueur 2.
 GOBBLET_REPRÉSENTATION = {
-    1: ["▫", "◇", "◯", "□"],
-    2: ["▪", "◆", "●", "■"],
+    1: [" ▫ ", " ◇ ", " ◯ ", " □ "],
+    2: [" ▪ ", " ◆ ", " ● ", " ■ "],
 }
 
 
@@ -54,10 +54,10 @@ def formater_un_gobblet(gobblet):
         str: Représentation du Gobblet pour le bon joueur
     """
     
-    if gobblet :
-        return a[gobblet[0]][gobblet[1]]
+    if gobblet != []:
+        return GOBBLET_REPRÉSENTATION[gobblet[0]][gobblet[1]]
     else :
-        return "\t"
+        return "   "
         
 
 
@@ -75,9 +75,9 @@ def formater_un_joueur(joueur):
     for i in joueur['piles'] :
         gobblets.append(formater_un_gobblet(i))
 
-    gobblets="".join(f)
+    gobblets="".join(gobblets)
 
-    return (joueur['nom'] + ": " + f)
+    return (joueur['nom'] + ":   " + gobblets)
 
 
 def formater_plateau(plateau):
@@ -90,13 +90,25 @@ def formater_plateau(plateau):
         str: Représentation du plateau avec ses Gobblet
     """
     gobs = []
+    plateau_form = str()
+    if plateau ==  [[[], [], [], []],[[], [], [], []],[[], [], [], []],[[], [], [], []],]:
+        plateau_form = (
+        "3   |   |   |   \n"
+        " ───┼───┼───┼───\n"
+        "2   |   |   |   \n"
+        " ───┼───┼───┼───\n"
+        "1   |   |   |   \n"
+        " ───┼───┼───┼───\n"
+        "0   |   |   |   \n"
+        "  0   1   2   3 "
+    )
+    else:
+        for i in plateau :
+            for j in i :
+                gobs.append(formater_un_gobblet(j))
 
-    for i in plateau :
-        for j in i :
-            gobs.append(formater_un_gobblet(j))
-
-    plateau = "3 {0} | {1} | {2} | {3} \n ───┼───┼───┼───\n2 {4} | {5} | {6} | {7} \n ───┼───┼───┼───\n1 {8} | {9} | {10} | {11} \n ───┼───┼───┼───\n0 {12} | {13} | {14} | {15} \n  0   1   2   3".format(gobs[0], gobs[1], gobs[2], gobs[3], gobs[4], gobs[5], gobs[6], gobs[7], gobs[8], gobs[9], gobs[10], gobs[11], gobs[12], gobs[13], gobs[14], gobs[15])
-    return plateau
+        plateau_form = "3{0}|{1}|{2}|{3}\n ───┼───┼───┼───\n2{4}|{5}|{6}|{7}\n ───┼───┼───┼───\n1{8}|{9}|{10}|{11}\n ───┼───┼───┼───\n0{12}|{13}|{14}|{15}\n  0   1   2   3".format(gobs[0], gobs[1], gobs[2], gobs[3], gobs[4], gobs[5], gobs[6], gobs[7], gobs[8], gobs[9], gobs[10], gobs[11], gobs[12], gobs[13], gobs[14], gobs[15])
+    return plateau_form
 
 def formater_jeu(plateau, joueurs):
     """Formater un jeu
@@ -165,4 +177,3 @@ def récupérer_le_coup():
     destination = input("Où voulez-vous placer votre Gobblet ? Donnez des coordonnées (x,y) : ")
 
     return (origine, destination)
-
