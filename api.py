@@ -1,3 +1,5 @@
+
+
 """Module d'API du jeu Gobblet
 
 Attributes:
@@ -14,7 +16,6 @@ import requests
 
 URL = "https://pax.ulaval.ca/gobblet/api/"
 
-
 def lister_parties(idul, secret):
     """Lister les parties
 
@@ -29,9 +30,24 @@ def lister_parties(idul, secret):
 
     Returns:
         list: Liste des parties reçues du serveur,
-             après avoir décodé le json de sa réponse.
+              après avoir décodé le json de sa réponse.
     """
-    pass
+
+    rep = requests.get(URL+'parties', auth=(idul, secret))
+
+    if rep.status_code == 200:
+        rep = rep.json()
+        dic_parties = rep['parties']
+        return dic_parties
+
+    elif rep.status_code == 401:
+        raise PermissionError()
+
+    elif rep.status_code == 406:
+        raise RuntimeError()
+
+    else:
+        raise ConnectionError()
 
 
 def débuter_partie(idul, secret):
@@ -51,7 +67,29 @@ def débuter_partie(idul, secret):
             de l'état du plateau de jeu et de la liste des joueurs,
             après avoir décodé le JSON de sa réponse.
     """
-    pass
+    rep = requests.post(URL+'partie', auth=(idul, secret))
+
+    if rep.status_code == 200:
+        rep = rep.json()
+
+        joueurs = []
+
+        joueurs.append(rep['joueurs'][0]['nom'])
+        joueurs.append(rep['joueurs'][1]['nom'])
+
+        rep_id = rep['id']
+        rep_plateau = rep['plateau']
+
+        return(rep_id, rep_plateau, joueurs)
+
+    elif rep.status_code == 401:
+        raise PermissionError()
+
+    elif rep.status_code == 406:
+        raise RuntimeError()
+
+    else:
+        raise ConnectionError()
 
 
 def récupérer_partie(id_partie, idul, secret):
@@ -72,7 +110,27 @@ def récupérer_partie(id_partie, idul, secret):
             de l'état du plateau de jeu et de la liste des joueurs,
             après avoir décodé le JSON de sa réponse.
     """
-    pass
+    rep = requests.get(URL+'partie'+str(id_partie), auth=(idul, secret))
+
+    if rep.status_code == 200:
+        rep = rep.json()
+
+        joueurs = []
+
+        joueurs.append(rep['joueurs'][0]['nom'])
+        joueurs.append(rep['joueurs'][1]['nom'])
+
+        rep_id = rep['id']
+        rep_plateau = rep['plateau']
+
+        return(rep_id, rep_plateau, joueurs)
+
+    elif rep.status_code == 401:
+        raise PermissionError()
+    elif rep.status_code == 406:
+        raise RuntimeError()
+    else:
+        raise ConnectionError()
 
 
 def jouer_coup(id_partie, origine, destination, idul, secret):
@@ -99,4 +157,34 @@ def jouer_coup(id_partie, origine, destination, idul, secret):
             de l'état du plateau de jeu et de la liste des joueurs,
             après avoir décodé le JSON de sa réponse.
     """
-    pass
+    rep = requests.put(URL+'jouer', auth=(idul, secret), json={
+        "id": "clé-de-la-partie",
+        "destination": [1, 3],
+        "origine": 0, })
+    rep.json()
+
+    if rep.status_code == 200:
+        rep = rep.json()
+
+        winner = rep['gagnant']
+
+        if winner == None:
+            joueurs = []
+
+            joueurs.append(rep['joueurs'][0]['nom'])
+            joueurs.append(rep['joueurs'][1]['nom'])
+
+            rep_id = rep['id']
+            rep_plateau = rep['plateau']
+
+            return(rep_id, rep_plateau, joueurs)
+
+        else :
+            raise StopIteration()
+
+    elif rep.status_code == 401:
+        raise PermissionError()
+    elif rep.status_code == 406:
+        raise RuntimeError()
+    else:
+        raise ConnectionError()
