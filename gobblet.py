@@ -30,12 +30,18 @@ def interpréteur_de_commande():
                    Cette objet aura l'attribut IDUL représentant l'idul du joueur
                    et l'attribut lister qui est un booléen True/False.
     """
-    parser = ArgumentParser()
+    parser = argparse.ArgumentParser()
+
+    parser.add_argument('IDUL', metavar='IDUL', help='IDUL du joueur')
+
+    parser.add_argument('-l', '--lister', action='store_true', help="Lister les parties existantes")
+        
+    args = parser.parse_args()
 
     # Complétez le code ici
     # vous pourriez aussi avoir à ajouter des arguments dans ArgumentParser(...)
 
-    return parser.parse_args()
+    return args
 
 
 def formater_un_gobblet(gobblet):
@@ -47,7 +53,12 @@ def formater_un_gobblet(gobblet):
     Returns:
         str: Représentation du Gobblet pour le bon joueur
     """
-    pass
+    
+    if gobblet :
+        return a[gobblet[0]][gobblet[1]]
+    else :
+        return "\t"
+        
 
 
 def formater_un_joueur(joueur):
@@ -59,7 +70,14 @@ def formater_un_joueur(joueur):
     Returns:
         str: Représentation du joueur et de ses piles de Gobblet
     """
-    pass
+    gobblets = []
+
+    for i in joueur['piles'] :
+        gobblets.append(formater_un_gobblet(i))
+
+    gobblets="".join(f)
+
+    return (joueur['nom'] + ": " + f)
 
 
 def formater_plateau(plateau):
@@ -71,8 +89,14 @@ def formater_plateau(plateau):
     Returns:
         str: Représentation du plateau avec ses Gobblet
     """
-    pass
+    gobs = []
 
+    for i in plateau :
+        for j in i :
+            gobs.append(formater_un_gobblet(j))
+
+    plateau = "3 {0} | {1} | {2} | {3} \n ───┼───┼───┼───\n2 {4} | {5} | {6} | {7} \n ───┼───┼───┼───\n1 {8} | {9} | {10} | {11} \n ───┼───┼───┼───\n0 {12} | {13} | {14} | {15} \n  0   1   2   3".format(gobs[0], gobs[1], gobs[2], gobs[3], gobs[4], gobs[5], gobs[6], gobs[7], gobs[8], gobs[9], gobs[10], gobs[11], gobs[12], gobs[13], gobs[14], gobs[15])
+    return plateau
 
 def formater_jeu(plateau, joueurs):
     """Formater un jeu
@@ -84,7 +108,13 @@ def formater_jeu(plateau, joueurs):
     Returns:
         str: Représentation du jeu
     """
-    pass
+    jeu = "          0  1  2\n"
+    for i in joueurs:
+        jeu+="{0}: {1}  {2}  {3}\n".format(i['nom'], formater_un_gobblet(i['piles'][0]), formater_un_gobblet(i['piles'][1]), formater_un_gobblet(i['piles'][2]))
+
+    jeu += "\n"+str(formater_plateau(plateau))
+
+    return jeu
 
 
 def formater_les_parties(parties):
@@ -98,7 +128,18 @@ def formater_les_parties(parties):
     Returns:
         str: Représentation des parties
     """
-    pass
+    parts = str()
+    nb = 1
+    gagnant = str()
+
+    for j in parties :
+        if j["gagnant"] == None :
+            gagnant = ""
+        else :
+            gagnant = ", gagnant: {0}".format(j["gagnant"])
+        parts += "{0}: {1}, {2} vs {3}{4}\n".format(nb, j["date"], j["joueurs"][0], j["joueurs"][1], gagnant)
+        nb+=1
+    return parts
 
 
 def récupérer_le_coup():
@@ -120,4 +161,8 @@ def récupérer_le_coup():
         Donnez le numéro de la pile (p) ou la position sur le plateau (x,y): 2,3
         Où voulez-vous placer votre Gobblet (x,y): 0,1
     """
-    pass
+    origine = input("Donnez le numéro de la pile (p) ou la position sur le plateau (x,y) : ")
+    destination = input("Où voulez-vous placer votre Gobblet ? Donnez des coordonnées (x,y) : ")
+
+    return (origine, destination)
+
